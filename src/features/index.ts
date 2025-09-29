@@ -1,0 +1,6 @@
+export {default as InsuranceForm} from './auth/insuranceForm'
+export {Home} from './home/index'
+export {default as OtpVerification} from './auth/otp-verification'
+export {OtpCode} from './auth/otp-code'
+export {ThankYouPopup} from './auth/ThankYouPopup '
+export {default as SubmitForm} from './auth/submitForm'
