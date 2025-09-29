@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../Redux/store";
 import { setInsuranceData } from "../Redux/insuranceSlice";
 
+// ✅ FIX: policyType explicitly optional
 const insuranceFormSchema = yup.object({
   firstName: yup
     .string()
@@ -37,24 +38,18 @@ const insuranceFormSchema = yup.object({
     .string()
     .required("Residence address is required")
     .min(10, "Please provide a complete address"),
-  city: yup
-    .string()
-    .required("City is required"),
+  city: yup.string().required("City is required"),
   areaZipCode: yup
     .string()
     .required("Area/Zip code is required")
     .matches(/^[0-9]{5,10}$/, "Please enter a valid zip code"),
-  state: yup
-    .string()
-    .required("State is required"),
+  state: yup.string().required("State is required"),
   age: yup
     .number()
     .required("Age is required")
     .min(18, "You must be at least 18 years old")
     .max(100, "Please enter a valid age"),
-  policyType: yup
-    .string(),
-    // .required("Please select a policy type"),
+  policyType: yup.string().optional(), // ✅ <-- changed here
   termsAccepted: yup
     .boolean()
     .oneOf([true], "You must agree to the terms and conditions"),
@@ -62,36 +57,37 @@ const insuranceFormSchema = yup.object({
 
 type InsuranceFormData = yup.InferType<typeof insuranceFormSchema>;
 
-
 export default function InsuranceForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); 
+  const [showPopup, setShowPopup] = useState(false);
   const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<InsuranceFormData>({
-    resolver: yupResolver(insuranceFormSchema),
-    defaultValues: {
-      termsAccepted: false,
-    },
-  });
+  register,
+  handleSubmit,
+  reset,
+  setValue,
+  watch,
+  formState: { errors },
+} = useForm({
+  resolver: yupResolver(insuranceFormSchema),
+  defaultValues: {
+    termsAccepted: false,
+  },
+});
+
+
 
   const watchedTermsAccepted = watch("termsAccepted");
   const dispatch = useDispatch<AppDispatch>();
 
- const onSubmit = async (data: InsuranceFormData) => {
+  const onSubmit = async (data: InsuranceFormData) => {
     setIsSubmitting(true);
     try {
-      await new Promise((r) => setTimeout(r, 1500)); 
+      await new Promise((r) => setTimeout(r, 1500));
       console.log("Form Data:", data);
       reset();
       dispatch(setInsuranceData(data));
       toast.success("Insurance request submitted successfully!");
-      setShowPopup(true); 
+      setShowPopup(true);
     } catch {
       toast.error("Something went wrong!");
     } finally {
@@ -106,10 +102,7 @@ export default function InsuranceForm() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 bg-[#F5F5F573] border border-[#9C9C9CC9] rounded-lg  my-[80px]">
-       <ThankYouPopup
-        isOpen={showPopup} 
-        onClose={() => setShowPopup(false)}
-        />
+      <ThankYouPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-[42px] text-gray-900 mb-2">
           Fill The <span className="text-teal-600">Insurance</span> Request Form
@@ -295,70 +288,69 @@ export default function InsuranceForm() {
             )}
           </div>
         </div>
+
         {/* Terms and Conditions */}
         <div className="space-y-4">
-          {
-            showPopup ? (
-                <p className="text-sm text-gray-700 leading-relaxed font-poppins">
-      <span className="font-poppins text-[16px] font-[700] text-[#1C1C1C]">
-        Thank You To Submitting Form. Please Verify Your Phone Number For Further Procedure
-      </span>
-    </p>
-            ) : (<div className="flex items-start space-x-3">
-            <Checkbox
-              id="termsAccepted"
-              checked={watchedTermsAccepted}
-              onCheckedChange={(checked) => setValue("termsAccepted", !!checked)}
-              className={cn(
-                "mt-1",
-                errors.termsAccepted && "border-red-500"
-              )}
-            />
-            <div className="space-y-1">
-              <Label
-                htmlFor="termsAccepted"
-                className="text-sm text-gray-700 leading-relaxed cursor-pointer font-poppins"
-              >
-                By Clicking Continue, You Agree To Our{" "}
-                <span className="text-[#1C1C1C] font-[600] font-poppins ">
-                  Terms & Conditions
-                </span>{" "}
-                with{" "}
-                <span className="text-[#1C1C1C] font-[600] font-poppins">
-                  Privacy Policy
-                </span>
-              </Label>
-              {errors.termsAccepted && (
-                <p className="text-sm text-red-600">{errors.termsAccepted.message}</p>
-              )}
+          {showPopup ? (
+            <p className="text-sm text-gray-700 leading-relaxed font-poppins">
+              <span className="font-poppins text-[16px] font-[700] text-[#1C1C1C]">
+                Thank You To Submitting Form. Please Verify Your Phone Number For Further Procedure
+              </span>
+            </p>
+          ) : (
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="termsAccepted"
+                checked={watchedTermsAccepted}
+                onCheckedChange={(checked) => setValue("termsAccepted", !!checked)}
+                className={cn(
+                  "mt-1",
+                  errors.termsAccepted && "border-red-500"
+                )}
+              />
+              <div className="space-y-1">
+                <Label
+                  htmlFor="termsAccepted"
+                  className="text-sm text-gray-700 leading-relaxed cursor-pointer font-poppins"
+                >
+                  By Clicking Continue, You Agree To Our{" "}
+                  <span className="text-[#1C1C1C] font-[600] font-poppins ">
+                    Terms & Conditions
+                  </span>{" "}
+                  with{" "}
+                  <span className="text-[#1C1C1C] font-[600] font-poppins">
+                    Privacy Policy
+                  </span>
+                </Label>
+                {errors.termsAccepted && (
+                  <p className="text-sm text-red-600">{errors.termsAccepted.message}</p>
+                )}
+              </div>
             </div>
-          </div>)
-          }
-          
+          )}
         </div>
 
         {/* Form Actions */}
         <div className="flex flex-col sm:flex-row gap-4 pt-6">
           <Button
-  type="button"
-  variant="outline"
-  onClick={handleReset}
-  disabled={isSubmitting}
-  className="bg-[#008EB1] w-[222px] cursor-pointer text-white border-teal-500 
-             hover:border-teal-600 transition-all duration-200 py-4 px-2"
->
-  Reset
-</Button>
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            disabled={isSubmitting}
+            className="bg-[#008EB1] w-[222px] cursor-pointer text-white border-teal-500 
+                       hover:border-teal-600 transition-all duration-200 py-4 px-2"
+          >
+            Reset
+          </Button>
 
-<Button
-  type="submit"
-  disabled={isSubmitting}
-  className="bg-[#03A765] w-[222px] cursor-pointer text-white 
-             transition-all duration-200 py-4 px-2"
->
-  {isSubmitting ? "Submitting..." : "Submit"}
-</Button>
-
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-[#03A765] w-[222px] cursor-pointer text-white 
+                       transition-all duration-200 py-4 px-2"
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </div>

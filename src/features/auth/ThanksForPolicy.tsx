@@ -9,9 +9,9 @@ interface ThankForPolicyProps {
 }
 
 export const ThankForPolicy: React.FC<ThankForPolicyProps> = ({ isOpen }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _router = useRouter(); // ✅ ignored by ESLint
   if (!isOpen) return null;
-  const route = useRouter();
- 
 
   return (
     <div className="absolute top-[300px] inset-0 flex items-center justify-center z-50">

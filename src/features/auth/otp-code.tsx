@@ -57,14 +57,6 @@ export const OtpCode = () => {
       });
     }
   };
-
-  const handleVerifyPhone = () => {
-    // Reset form
-    setOtp(['', '', '', '', '', '']);
-    setMessage({ type: '', text: '' });
-    inputRefs.current[0]?.focus();
-  };
-
   useEffect(() => {
     inputRefs.current[0]?.focus();
   }, []);
